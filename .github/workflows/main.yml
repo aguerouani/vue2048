@@ -74,7 +74,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: dist
-      - run: npx @azure/static-web-apps-cli deploy ./dist --app-name ${{ env.QA_APP_NAME }} --env=production
+      - run: pnpx @azure/static-web-apps-cli deploy ./dist --app-name ${{ env.QA_APP_NAME }} --env=production
 
   deploy-prod:
     needs: build
@@ -86,4 +86,4 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: dist
-      - run: npx @azure/static-web-apps-cli deploy ./dist --app-name ${{ env.PROD_APP_NAME }} --env=production
+      - run: pnpx @azure/static-web-apps-cli deploy ./dist --app-name ${{ env.PROD_APP_NAME }} --env=production
