@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
         with:
           version: ${{ env.PNPM_VERSION }}
       - run: corepack enable
@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
       - uses: actions/cache@v3
         with:
           path: |
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
+      - uses: pnpm/action-setup@v4
       - uses: actions/cache@v3
         with:
           path: |
@@ -71,7 +71,9 @@ jobs:
       name: qa
       url: https://${{ env.QA_APP_NAME }}.azurewebsites.net
     steps:
+      - uses: pnpm/action-setup@v4
       - uses: actions/download-artifact@v4
+
         with:
           name: dist
       - run: pnpm dlx @azure/static-web-apps-cli deploy ./dist --app-name ${{ env.QA_APP_NAME }} --env=production
@@ -83,7 +85,8 @@ jobs:
       name: production
       url: https://${{ env.PROD_APP_NAME }}.azurewebsites.net
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/download-artifact@v4 
         with:
           name: dist
       - run: pnpm dlx @azure/static-web-apps-cli deploy ./dist --app-name ${{ env.PROD_APP_NAME }} --env=production
