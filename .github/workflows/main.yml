@@ -44,7 +44,7 @@ jobs:
             node_modules
           key: ${{ runner.os }}-pnpm-${{ hashFiles('pnpm-lock.yaml') }}
       - run: pnpm build
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist/
@@ -68,10 +68,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     environment:
-      name: QA
+      name: qa
       url: https://${{ env.QA_APP_NAME }}.azurewebsites.net
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: dist
       - run: npx @azure/static-web-apps-cli deploy ./dist --app-name ${{ env.QA_APP_NAME }} --env=production
@@ -80,10 +80,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     environment:
-      name: Production
+      name: production
       url: https://${{ env.PROD_APP_NAME }}.azurewebsites.net
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: dist
       - run: npx @azure/static-web-apps-cli deploy ./dist --app-name ${{ env.PROD_APP_NAME }} --env=production
