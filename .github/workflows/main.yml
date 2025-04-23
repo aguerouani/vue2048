@@ -48,7 +48,8 @@ deploy-qa:
     name: QA
   script:
     - pnpx @azure/static-web-apps-cli deploy ./dist --app-name stapp-vue2048-qa --env=production
-  rules : when: manual
+  rules : 
+    - when: manual
 
 deploy-production:
   stage: production
@@ -56,4 +57,5 @@ deploy-production:
     name: Prod
   script:
     - pnpx @azure/static-web-apps-cli deploy ./dist --app-name stapp-vue2048-prod --env=production
-  rules : when: manual
+  rules : 
+    - when: manual
