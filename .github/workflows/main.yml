@@ -68,6 +68,7 @@ jobs:
       name: qa
       url: https://${{ env.QA_APP_NAME }}.azurewebsites.net
     steps:
+      - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
       - uses: actions/download-artifact@v4
 
@@ -82,6 +83,7 @@ jobs:
       name: production
       url: https://${{ env.PROD_APP_NAME }}.azurewebsites.net
     steps:
+      - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
       - uses: actions/download-artifact@v4 
         with:
