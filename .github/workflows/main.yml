@@ -68,14 +68,18 @@ jobs:
       name: qa
       url: https://${{ env.QA_APP_NAME }}.azurewebsites.net
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
       - uses: actions/download-artifact@v4
-
         with:
           name: dist
           path: dist/
-      - run: pnpm dlx @azure/static-web-apps-cli deploy ./dist --app-name ${{ env.QA_APP_NAME }} --env=production
+      - uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_TOKEN_QA }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "dist"  
+          api_location: ""    
+          output_location: ""  
 
   deploy-prod:
     needs: build
@@ -84,10 +88,15 @@ jobs:
       name: production
       url: https://${{ env.PROD_APP_NAME }}.azurewebsites.net
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
       - uses: actions/download-artifact@v4 
         with:
           name: dist
           path: dist/
-      - run: pnpm dlx @azure/static-web-apps-cli deploy ./dist --app-name ${{ env.PROD_APP_NAME }} --env=production
+      - uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_TOKEN_PROD }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "dist"  
+          api_location: ""    
+          output_location: "" 
