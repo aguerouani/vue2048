@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     tags: 
-      - 'v*'
+      - 'v*' # match all tags starting with 'v'
     branches: [ main ]
     paths-ignore: 
       - 'docs/**'
@@ -125,7 +125,8 @@ jobs:
           output_location: "" 
   create-pr-environment:
     needs: [build]
-    if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'deploy-preview') && github.event.action != 'closed'}}
+    #match PRs with the label 'deploy-preview' and not closed
+    if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'deploy-preview') && github.event.action != 'closed'}}  
     runs-on: ubuntu-latest
     environment: pr-preview
     steps:
