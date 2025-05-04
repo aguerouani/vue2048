@@ -3,12 +3,26 @@ name: CI/CD Pipeline
 on:
   push:
     branches: [ main ]
+    paths-ignore: 
+      - 'docs/**'
   pull_request:
     branches: [ main ]
+    paths-ignore: 
+      - 'docs/**'
   workflow_dispatch:
+      inputs:
+        run_checks:
+          description: 'Exécuter les analyses et tests'
+          required: true
+          type: boolean
+          default: false
+  schedule:
+    - cron: '0 8 * * 1'
 env:
   QA_APP_NAME: stapp-vue2048-qa
   PROD_APP_NAME: stapp-vue2048-prod
+  ARTIFACT_RETENTION_DAYS: ${{ github.ref == 'refs/heads/main' && 7 || 1 }}
+
 
 jobs:
   setup:
@@ -45,9 +59,11 @@ jobs:
         with:
           name: dist
           path: dist/
+          retention-days: ${{ env.ARTIFACT_RETENTION_DAYS }}
+
 
   test:
-    if: github.event_name == 'pull_request' # Exécuté seulement sur PR
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && github.event.inputs.run_checks) }}
     needs: setup
     runs-on: ubuntu-latest
     steps:
