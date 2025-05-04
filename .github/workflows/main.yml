@@ -120,3 +120,74 @@ jobs:
           app_location: "dist"  
           api_location: ""    
           output_location: "" 
+  create-pr-environment:
+    needs: [build]
+    if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'deploy-preview') }}
+    runs-on: ubuntu-latest
+    environment: pr-preview
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Create Static Web App environment
+        uses: azure/CLI@v1
+        id: create-env
+        with:
+          inlineScript: |
+            PR_NUMBER=${{ github.event.pull_request.number }}
+            ENV_NAME="preview-pr-$PR_NUMBER"
+            
+            # Create environment
+            az staticwebapp environment create \
+              --name ${{ env.QA_APP_NAME }} \
+              --environment-name $ENV_NAME \
+              --branch "pr-$PR_NUMBER"
+            
+            # Deploy application
+            az staticwebapp deploy \
+              --name ${{ env.QA_APP_NAME }} \
+              --environment-name $ENV_NAME \
+              --source ./dist
+            
+            # Get environment URL
+            URL=$(az staticwebapp show --name ${{ env.QA_APP_NAME }} --query "defaultHostname" -o tsv)
+            echo "PR_ENV_URL=https://$ENV_NAME-$URL" >> $GITHUB_OUTPUT
+      
+      - name: Post PR comment with preview link
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🌎 Environnement de prévisualisation déployé : ${{ steps.create-env.outputs.PR_ENV_URL }}`
+            })
+
+  cleanup-pr-environment:
+    if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Delete Static Web App environment
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            PR_NUMBER=${{ github.event.pull_request.number }}
+            ENV_NAME="preview-pr-$PR_NUMBER"
+            az staticwebapp environment delete \
+              --name ${{ env.QA_APP_NAME }} \
+              --environment-name $ENV_NAME \
+              --yes
+
