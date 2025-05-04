@@ -153,25 +153,13 @@ jobs:
       - name: Get deployment URL
         id: get_url
         run: |
-          # Attendre que le déploiement soit complet
-          sleep 30
+
           URL="https://pr-${{ github.event.number }}-${{ env.QA_APP_NAME }}.azurestaticapps.net"
           echo "PR_ENV_URL=$URL" >> $GITHUB_OUTPUT
   
-      - name: Post PR comment
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `🚀 **Environnement de preview**\n\n` +
-                    `Accédez à l'application: [${{ steps.get_url.outputs.PR_ENV_URL }}](${{ steps.get_url.outputs.PR_ENV_URL }})\n\n` +
-                    `*Cet environnement sera automatiquement supprimé quand la PR sera fermée*`
-            })
   
   cleanup_pr_environment:
+      needs: [create-pr-environment]
       if: github.event.action == 'closed'
       runs-on: ubuntu-latest
       steps:
