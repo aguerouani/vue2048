@@ -123,7 +123,7 @@ jobs:
           output_location: "" 
   create-pr-environment:
     needs: [build]
-    if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'deploy-preview') }}
+    if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'deploy-preview') && github.event.action != 'closed'}}
     runs-on: ubuntu-latest
     environment: pr-preview
     steps:
