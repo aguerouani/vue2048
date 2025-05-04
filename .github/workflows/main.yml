@@ -160,7 +160,7 @@ jobs:
   
   cleanup_pr_environment:
       needs: [create-pr-environment]
-      if: github.event.action == 'closed'
+      if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed'}}
       runs-on: ubuntu-latest
       steps:
         - name: Delete PR Environment
