@@ -6,7 +6,7 @@ on:
     paths-ignore: 
       - 'docs/**'
   pull_request:
-    types: [labeled, synchronize]  #
+    types: [labeled, synchronize]  
     branches: [ main ]
     paths-ignore: 
       - 'docs/**'
@@ -142,6 +142,7 @@ jobs:
         id: create-env
         with:
           inlineScript: |
+            az extension add --name static-web-apps --yes
             PR_NUMBER=${{ github.event.pull_request.number }}
             ENV_NAME="preview-pr-$PR_NUMBER"
             
